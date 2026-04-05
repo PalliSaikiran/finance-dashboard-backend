@@ -29,7 +29,13 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ success: false, message: 'Internal server error' });
 });
-
+// Auto-seed if DB is empty
+const db = require('./src/config/db');
+const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
+if (userCount === 0) {
+  console.log('Seeding demo data...');
+  require('./src/config/seed');
+}
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`\n🚀 Finance Backend running on http://localhost:${PORT}`);
